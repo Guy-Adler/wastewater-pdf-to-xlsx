@@ -1,0 +1,25 @@
+{
+  "dateFormat": "%d/%m/%y",
+  "tables": {
+    "results": {
+      "testNames": {
+        "TSS מוצקים מרחפים": "tss_suspended_solids",
+        "VSS מוצקים מרחפים נדיפים": "vss_volatile_suspended_solids",
+        "COD כללי": "cod_total",
+        "BOD כללי": "bod_total",
+        "(TKN) חנקן קלדהל": "tkn_kjeldahl_nitrogen",
+        "זרחן כללי": "phosphorus_total",
+        "(CFA)חנקן אמוניאקלי": "cfa_ammonia_nitrogen",
+        "קוליפורמים פקאלים": "fecal_coliforms",
+        "כלור חופשי-בדיקת שטח-לקוח": "free_chlorine_field_customer",
+        "עכירות-בדיקת שטח-לקוח": "turbidity_field_customer",
+        "חנקן קלדהל (חישוב)": "tkn_kjeldahl_nitrogen_calc",
+        "(IC-ב) N-ניטריט כ": "ic_nitrite_n",
+        "(IC-ב) N-ניטראט כ": "ic_nitrate_n",
+        "(MERCK)חנקן כללי": "merck_total_nitrogen",
+        "שמנים ושומנים": "oils_and_grease",
+        "שמן מנרלי - FTIR- קבלנות משנה": "mineral_oil_ftir_subcontractor"
+      }
+    }
+  }
+}

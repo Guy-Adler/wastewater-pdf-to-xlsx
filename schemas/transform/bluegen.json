@@ -1,0 +1,21 @@
+{
+  "dateFormat": "%d/%m/%y",
+  "tables": {
+    "results": {
+      "testNames": {
+        "מוליכות": "conductivity",
+        "(pH) הגבה": "ph_level",
+        "כלורידים": "chlorides",
+        "ICP -ב Na": "icp_na",
+        "COD כללי": "cod_total",
+        "TSS מוצקים מרחפים": "tss_suspended_solids",
+        "חנקן כללי": "total_nitrogen",
+        "חנקן אמוניקלי": "ammonia_nitrogen",
+        "כלורידים -Cl- שיטה פוטנציומטרית": "chlorides_potentiometric_cl",
+        "עכירות - בדיקה בשטח": "turbidity_field_test",
+        "כלור כללי - בדיקה בשטח": "total_chlorine_field_test",
+        "ICP -ב (Na) בדיקת נתרן": "icp_sodium_test"
+      }
+    }
+  }
+}

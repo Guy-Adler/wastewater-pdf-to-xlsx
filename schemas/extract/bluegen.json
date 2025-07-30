@@ -1,6 +1,5 @@
 {
   "identifierRegex": "בלוג'ן בע\"מ\nשדרות מנחם בגין 35 , טירת הכרמל.",
-  "dateFormat": "%d/%m/%y",
   "samplingDateExtractionRegex": "תאריך הדגימה: (?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})",
   "tables": {
     "results": {

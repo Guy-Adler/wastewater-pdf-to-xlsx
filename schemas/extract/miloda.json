@@ -1,1 +1,30 @@
-{}
+{
+  "identifierRegex": "[*]{2} סוף תעודה [*]{2}",
+  "samplingDateExtractionRegex": "תאריך דיגום: (?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})",
+  "tables": {
+    "results": {
+      "tableNumber": 0,
+      "headerRowCount": 2,
+      "columns": {
+        "3": [
+          "result",
+          "unit",
+          "testName"
+        ],
+        "4": [
+          "maxSpec",
+          "result",
+          "unit",
+          "testName"
+        ],
+        "5": [
+          "maxSpec",
+          "minSpec",
+          "result",
+          "unit",
+          "testName"
+        ]
+      }
+    }
+  }
+}

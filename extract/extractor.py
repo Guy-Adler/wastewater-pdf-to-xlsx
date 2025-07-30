@@ -8,7 +8,6 @@ Assumptions made (should be kept to a minimum):
 import pdfplumber
 import re
 from typing import List
-from datetime import datetime
 from bidi.algorithm import get_display
 from utils import ExtractedTables
 from .schemas import ExtractSchemaManager
@@ -23,7 +22,7 @@ class PdfExtractor:
   _pdf: pdfplumber.PDF
   _pdf_content: str
 
-  sampling_date: datetime
+  sampling_date: str
   tables: dict[str, List[dict[str, str | None]]]
   schemaName: str
   schema: dict
@@ -49,7 +48,6 @@ class PdfExtractor:
       self._extract_tables()
 
   def _extract_sampling_date(self) -> None:
-    date_format = self.schema.get('dateFormat', "%d/%m/%y")
     sampling_date_extraction_regex = self.schema.get('samplingDateExtractionRegex', None)
     if sampling_date_extraction_regex:
       pattern = re.compile(sampling_date_extraction_regex)
@@ -63,8 +61,7 @@ class PdfExtractor:
     else:
       raise ValueError("No sampling date found in the PDF content")
     
-    self.sampling_date = datetime.strptime(sampling_date, date_format)
-
+    self.sampling_date = sampling_date
 
   def _extract_tables(self) -> None:
     tables_schema = self.schema.get('tables')
