@@ -5,6 +5,7 @@ import io
 import sys
 import tempfile
 import traceback
+import urllib.parse
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 from extract import PdfExtractor
 from transform import Transformer
@@ -30,27 +31,23 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'pdf_file' not in request.files or 'xlsx_file' not in request.files:
-        flash('Both PDF and XLSX files are required')
-        return redirect(url_for('index'))
+        return {'error': 'Both PDF and XLSX files are required'}, 400
 
     pdf_file = request.files['pdf_file']
     xlsx_file = request.files['xlsx_file']
     
     # Check if files were selected
     if pdf_file.filename == '' or xlsx_file.filename == '':
-        flash('Both PDF and XLSX files must be selected')
-        return redirect(url_for('index'))
+        return {'error': 'Both PDF and XLSX files must be selected'}, 400
     
     # Check file extensions
     if not (pdf_file and allowed_file(pdf_file.filename) and 
             pdf_file.filename.lower().endswith('.pdf')):
-        flash('Invalid PDF file')
-        return redirect(url_for('index'))
+        return {'error': 'Invalid PDF file'}, 400
     
     if not (xlsx_file and allowed_file(xlsx_file.filename) and 
             xlsx_file.filename.lower().endswith(('.xlsx', '.xls'))):
-        flash('Invalid XLSX/XLS file')
-        return redirect(url_for('index'))
+        return {'error': 'Invalid XLSX/XLS file'}, 400
     
     try:
         # Read files into memory
@@ -92,14 +89,17 @@ def upload_file():
             loader = Loader(xlsx_temp_path, 'acre')
             loader.load(transformed_data)
             
-            # Return the processed file from memory
-            
-            return send_file(
+            # Return the processed file with proper headers
+            response = send_file(
                 xlsx_temp_path,
                 as_attachment=True,
                 download_name=xlsx_file.filename,
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                max_age=0
             )
+            
+            # Let Flask handle the filename encoding automatically
+            return response
                     
         finally:
             # Clean up temporary input files
@@ -109,9 +109,8 @@ def upload_file():
                 os.unlink(xlsx_temp_path)
         
     except Exception as e:
-        flash(f'Error processing files: {str(e)}')
         print(traceback.format_exc(), file=sys.stderr)
-        return redirect(url_for('index'))
+        return {'error': f'Error processing files: {str(e)}'}, 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

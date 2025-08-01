@@ -273,13 +273,108 @@
     });
 
     // Form submission
-    document.getElementById('uploadForm').addEventListener('submit', function () {
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevent default form submission
+
       const submitBtn = document.getElementById('submitBtn');
       const loading = document.getElementById('loading');
+      const formData = new FormData(this);
 
       submitBtn.disabled = true;
       submitBtn.textContent = 'Processing...';
       loading.style.display = 'block';
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          // Get the filename from the response headers
+          const contentDisposition = response.headers.get('content-disposition');
+          let filename = 'processed_file.xlsx';
+
+          console.log('Content-Disposition header:', contentDisposition);
+
+          // First, try to use the original XLSX filename
+          const xlsxFile = document.getElementById('xlsx_file').files[0];
+          if (xlsxFile) {
+            filename = xlsxFile.name;
+            console.log('Using original filename:', filename);
+          }
+
+          // If we have a content-disposition header, try to extract filename from it
+          if (contentDisposition) {
+            // Try different patterns for filename extraction
+            let filenameMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/);
+            if (!filenameMatch) {
+              filenameMatch = contentDisposition.match(/filename="([^"]+)"/);
+            }
+            if (!filenameMatch) {
+              filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+            }
+
+            if (filenameMatch) {
+              const extractedFilename = decodeURIComponent(filenameMatch[1]);
+              console.log('Extracted filename from header:', extractedFilename);
+              // Only use header filename if it's different from the original and not empty
+              if (extractedFilename && extractedFilename.trim() && extractedFilename !== filename) {
+                filename = extractedFilename;
+              }
+            }
+          }
+
+          return response.blob().then(blob => {
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            // Reset UI after successful download
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🚀 Process Files';
+            loading.style.display = 'none';
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Reset UI on error
+          submitBtn.disabled = false;
+          submitBtn.textContent = '🚀 Process Files';
+          loading.style.display = 'none';
+
+          // Show error message
+          const flashMessages = document.querySelector('.flash-messages') ||
+            document.createElement('div');
+          if (!document.querySelector('.flash-messages')) {
+            flashMessages.className = 'flash-messages';
+            document.querySelector('.container').insertBefore(
+              flashMessages,
+              document.querySelector('.upload-form')
+            );
+          }
+
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'flash-message error';
+          errorDiv.textContent = 'Error processing files. Please try again.';
+          flashMessages.appendChild(errorDiv);
+
+          // Remove error message after 5 seconds
+          setTimeout(() => {
+            if (errorDiv.parentNode) {
+              errorDiv.parentNode.removeChild(errorDiv);
+            }
+          }, 5000);
+        });
     });
 
     // Drag and drop functionality
