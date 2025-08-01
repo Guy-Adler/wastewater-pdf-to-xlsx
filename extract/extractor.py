@@ -26,6 +26,7 @@ class PdfExtractor:
   tables: dict[str, List[dict[str, str | None]]]
   schemaName: str
   schema: dict
+  type: str
 
   def __init__(self, pdf_path: str):
     self.pdf_path = pdf_path
@@ -45,6 +46,7 @@ class PdfExtractor:
         raise ValueError("No matching schema found for the PDF content")
       
       self._extract_sampling_date()
+      self._extract_type()
       self._extract_tables()
 
   def _extract_sampling_date(self) -> None:
@@ -62,6 +64,18 @@ class PdfExtractor:
       raise ValueError("No sampling date found in the PDF content")
     
     self.sampling_date = sampling_date
+
+  def _extract_type(self) ->None:
+    type_extraction_schema = self.schema.get('type', None)
+    if not type_extraction_schema:
+      raise ValueError("No type extraction schema defined in the schema")
+    
+    for regex, type_value in type_extraction_schema.items():
+      if re.search(regex, self._pdf_content):
+        self.type = type_value
+        return
+    
+    raise ValueError("No matching type found in the PDF content")
 
   def _extract_tables(self) -> None:
     tables_schema = self.schema.get('tables')

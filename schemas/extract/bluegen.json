@@ -1,6 +1,10 @@
 {
   "identifierRegex": "בלוג'ן בע\"מ\nשדרות מנחם בגין 35 , טירת הכרמל.",
   "samplingDateExtractionRegex": "תאריך הדגימה: (?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})",
+  "type": {
+    "סוג דיגום: .* שפכים .*": "wastewater",
+    "סוג דיגום: קולחין שלישוני.*": "effluent_tertiary"
+  },
   "tables": {
     "results": {
       "tableNumber": 1,

@@ -1,9 +1,8 @@
 """
-Schema utilities for PDF extraction.
+Schema utilities for transforming data to structured formats.
 """
 import os
 import json
-import re
 
 class TransformSchemaManager:
   _instance = None

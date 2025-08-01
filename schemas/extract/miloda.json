@@ -1,6 +1,10 @@
 {
   "identifierRegex": "[*]{2} סוף תעודה [*]{2}",
   "samplingDateExtractionRegex": "תאריך דיגום: (?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})",
+  "type": {
+    "חומר לבדיקה: שפכים": "wastewater",
+    "קולחי(ם|ן) שלישוני": "effluent_tertiary"
+  },
   "tables": {
     "results": {
       "tableNumber": 0,
