@@ -1,0 +1,59 @@
+{
+  "dateFormat": "d/m/yy",
+  "sheets": {
+    "wastewater": {
+      "name": "שפכים",
+      "headerRowCount": 5,
+      "fields": {
+        "tss_suspended_solids": {
+          "column": "F"
+        },
+        "cod_total": {
+          "column": "K"
+        },
+        "bod_total": {
+          "column": "I"
+        },
+        "tkn_kjeldahl_nitrogen": {
+          "column": "M"
+        },
+        "oils_and_grease": {
+          "column": "O"
+        },
+        "mineral_oil_ftir_subcontractor": {
+          "column": "N"
+        }
+      }
+    },
+    "effluent_tertiary": {
+      "name": "קולחין  שלישוני",
+      "headerRowCount": 6,
+      "fields": {
+        "cod_total": {
+          "column": "F"
+        },
+        "tss_suspended_solids": {
+          "column": "G"
+        },
+        "total_nitrogen": {
+          "column": "L"
+        },
+        "ammonia_nitrogen": {
+          "column": "K"
+        },
+        "chlorides_potentiometric_cl": {
+          "column": "M"
+        },
+        "turbidity_field_test": {
+          "column": "J"
+        },
+        "total_chlorine_field_test": {
+          "column": "BF"
+        },
+        "icp_sodium_test": {
+          "column": "AS"
+        }
+      }
+    }
+  }
+}

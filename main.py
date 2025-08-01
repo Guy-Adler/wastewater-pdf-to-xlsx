@@ -1,5 +1,8 @@
+#!.venv/bin/python3
+
 from extract import PdfExtractor
 from transform import Transformer
+from load import Loader
 import os
 
 def get_all_example_files():
@@ -18,11 +21,19 @@ def main():
     pdf_extractor = PdfExtractor(pdf_path)
     extracted_data = {
       "sampling_date": pdf_extractor.sampling_date,
-      "tables": pdf_extractor.tables
+      "tables": pdf_extractor.tables,
+      "type": pdf_extractor.type,
     }
     transformer = Transformer(pdf_extractor.schemaName, extracted_data)
 
-    print(f"{pdf_path=}; {transformer.sampling_date=}; {transformer.results=}")
+    transformed_data = {
+      "type": extracted_data["type"],
+      "sampling_date": transformer.sampling_date,
+      "results": transformer.results,
+    }
+
+    loader = Loader('output.xlsx', 'acre')
+    loader.load(transformed_data)
 
 if __name__ == "__main__":
   main()
