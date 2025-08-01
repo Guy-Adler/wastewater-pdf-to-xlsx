@@ -217,7 +217,7 @@
 
     <form class="upload-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data"
       id="uploadForm">
-      <div class="file-input-group">
+      <div class="file-input-group" id="pdf-group">
         <label for="pdf_file">PDF File:</label>
         <div class="file-input">
           <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
@@ -228,7 +228,7 @@
         <div id="pdf-selected" class="selected-file" style="display: none;"></div>
       </div>
 
-      <div class="file-input-group">
+      <div class="file-input-group" id="xlsx-group">
         <label for="xlsx_file">XLSX/XLS File:</label>
         <div class="file-input">
           <input type="file" id="xlsx_file" name="xlsx_file" accept=".xlsx,.xls" required>
@@ -378,26 +378,30 @@
     });
 
     // Drag and drop functionality
-    function setupDragAndDrop(inputId, labelSelector) {
+    function setupDragAndDrop(inputId, containerSelector) {
       const input = document.getElementById(inputId);
-      const label = document.querySelector(labelSelector);
+      const container = document.querySelector(containerSelector);
+      const label = container.querySelector('.file-input-label');
 
-      label.addEventListener('dragover', function (e) {
+      container.addEventListener('dragover', function (e) {
         e.preventDefault();
-        this.style.background = '#e9ecef';
-        this.style.borderColor = '#adb5bd';
+        label.style.background = '#e9ecef';
+        label.style.borderColor = '#adb5bd';
       });
 
-      label.addEventListener('dragleave', function (e) {
+      container.addEventListener('dragleave', function (e) {
         e.preventDefault();
-        this.style.background = '#f8f9fa';
-        this.style.borderColor = '#dee2e6';
+        // Only reset if we're leaving the container entirely
+        if (!this.contains(e.relatedTarget)) {
+          label.style.background = '#f8f9fa';
+          label.style.borderColor = '#dee2e6';
+        }
       });
 
-      label.addEventListener('drop', function (e) {
+      container.addEventListener('drop', function (e) {
         e.preventDefault();
-        this.style.background = '#f8f9fa';
-        this.style.borderColor = '#dee2e6';
+        label.style.background = '#f8f9fa';
+        label.style.borderColor = '#dee2e6';
 
         const files = e.dataTransfer.files;
         if (files.length > 0) {
@@ -407,8 +411,8 @@
       });
     }
 
-    setupDragAndDrop('pdf_file', 'label[for="pdf_file"]');
-    setupDragAndDrop('xlsx_file', 'label[for="xlsx_file"]');
+    setupDragAndDrop('pdf_file', '#pdf-group');
+    setupDragAndDrop('xlsx_file', '#xlsx-group');
   </script>
 </body>
 
