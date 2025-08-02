@@ -22,6 +22,9 @@
         },
         "mineral_oil_ftir_subcontractor": {
           "column": "N"
+        },
+        "chlorides": {
+          "column": "Q"
         }
       }
     },
@@ -29,11 +32,20 @@
       "name": "קולחין  שלישוני",
       "headerRowCount": 6,
       "fields": {
+        "bod_total": {
+          "column": "E"
+        },
         "cod_total": {
           "column": "F"
         },
         "tss_suspended_solids": {
           "column": "G"
+        },
+        "fecal_coliforms": {
+          "column": "H"
+        },
+        "turbidity_field_customer": {
+          "column": "J"
         },
         "total_nitrogen": {
           "column": "L"
