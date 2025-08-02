@@ -45,7 +45,7 @@ class Loader:
           break
       
       if not row:
-        print(f'No existing row found for date {data["sampling_date"]}', sys.stderr)
+        print(f'No existing row found for date {data["sampling_date"]}', file=sys.stderr)
         return
 
       for field, field_schema in sheet_schema.get('fields', {}).items():
