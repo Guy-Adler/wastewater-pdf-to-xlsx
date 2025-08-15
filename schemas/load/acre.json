@@ -1,5 +1,4 @@
 {
-  "dateFormat": "d/m/yy",
   "sheets": {
     "wastewater": {
       "name": "שפכים",
@@ -32,6 +31,10 @@
       "name": "קולחין  שלישוני",
       "headerRowCount": 6,
       "fields": {
+        "date": {
+          "column": "A",
+          "format": "d/m/yy"
+        },
         "bod_total": {
           "column": "E"
         },
