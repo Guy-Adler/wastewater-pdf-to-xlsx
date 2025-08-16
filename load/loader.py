@@ -84,6 +84,9 @@ class Loader:
       else:
         end = mid - 1
 
+    if not self.sheet_schema.get("addMissingRows", True):
+      print(f'Skip adding missing row for date={date.isoformat()}')
+      return None
     # Insert missing rows
     one_day = datetime.timedelta(days=1)
     start_date = date - one_day if end < min_date_row else extract_date_from_row(self.worksheet[end], date_column)
