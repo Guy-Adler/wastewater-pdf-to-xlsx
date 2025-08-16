@@ -5,6 +5,7 @@ Assumptions made (should be kept to a minimum):
 - There are at least 2 rows of data
 - The second row of data is good to use as a "format template"
 - If there are rows in which the first column is not a date, they are at the end of the row list.
+- Date rows are continuos (there are no breaks of non date values in the date column)
 """
 
 import datetime
@@ -12,6 +13,7 @@ import sys
 from typing import Any
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.cell import Cell
 import openpyxl.utils
 from copy import copy
 from .schemas import LoadSchemaManager
@@ -19,6 +21,13 @@ from .utils import WorkbookContext
 
 def column_index_from_string(col_letter: str) -> int:
   return openpyxl.utils.column_index_from_string(col_letter) - 1
+
+def extract_date_from_row(r: tuple[Cell], date_column: int) -> datetime.date | None:
+  if type(r[date_column].value) is datetime.date:
+    return r[date_column].value
+  if type(r[date_column].value) is datetime.datetime:
+    return r[date_column].value.date()
+  return None
 
 schemaManager = LoadSchemaManager()
 
@@ -36,40 +45,64 @@ class Loader:
       raise ValueError(f"No schema found for name: {schema_name}")
     self.file_path = file_path
 
+  def _get_max_date_row(self):
+    date_column = column_index_from_string(self.sheet_schema.get("fields", {}).get("date", {}).get("column", "A"))
+    row_idx = self.worksheet.max_row
+    first_row = self.sheet_schema.get('headerRowCount', 0) + 1
+    while row_idx >= first_row:
+      if extract_date_from_row(self.worksheet[row_idx], date_column) is not None:
+        return row_idx
+      row_idx -= 1
+    raise Exception('Could not find a date row')
+
   def _get_row(self, date: datetime.date):
     """
     Binary search for the row with the given date in the first column.
     If not found, insert a new row in the correct place (sorted by date).
-    Returns the row.
+    Also insert all rows between the missing date and the previous/next dates.
+    Returns the row of the given date.
     """
     date_column = column_index_from_string(self.sheet_schema.get("fields", {}).get("date", {}).get("column", "A"))
+    min_date_row = self.sheet_schema.get('headerRowCount', 0) + 1
+    max_date_row = self._get_max_date_row()
 
-    left = self.sheet_schema.get('headerRowCount', 0) + 1
-    right = self.worksheet.max_row
+    start = min_date_row
+    end = max_date_row
 
-    while left <= right:
-      mid = (left + right) // 2
+    while start <= end:
+      mid = (start + end) // 2
       row = self.worksheet[mid]
-      row_date: datetime.date = None
-      date_cell = row[date_column];
-      if (type(date_cell.value) is datetime.datetime):
-        row_date = date_cell.value.date()
-      elif (type(date_cell.value) is datetime.date):
-        row_date = date_cell.value
-      else:
-        right -= 1
+      row_date = extract_date_from_row(row, date_column)
+      if row_date is None:
+        end -= 1
         continue
 
       if date == row_date:
         return row
       elif row_date < date:
-        left = mid + 1
+        start = mid + 1
       else:
-        right = mid - 1
+        end = mid - 1
 
-    row = self._add_row(left)
-    row[date_column].value = date
-    return row
+    # Insert missing rows
+    one_day = datetime.timedelta(days=1)
+    start_date = date - one_day if end < min_date_row else extract_date_from_row(self.worksheet[end], date_column)
+    end_date = date if start >= max_date_row else extract_date_from_row(self.worksheet[start], date_column) - one_day
+
+    current_date = end_date
+    date_row: tuple[Cell] = None
+
+    # Fill all rows in range (start_date, end_date]
+    while current_date > start_date:
+      row = self._add_row(start)
+
+      if current_date == date:
+        date_row = row
+
+      row[date_column].value = current_date
+      current_date -= one_day
+
+    return date_row
   
   def _add_row(self, row_index: int, template_row: int = None):
     """
