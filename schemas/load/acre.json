@@ -32,8 +32,7 @@
       "headerRowCount": 6,
       "fields": {
         "date": {
-          "column": "A",
-          "format": "d/m/yy"
+          "column": "A"
         },
         "bod_total": {
           "column": "E"
