@@ -28,8 +28,9 @@ class PdfExtractor:
   schema: dict
   type: str
 
-  def __init__(self, pdf_path: str):
+  def __init__(self, pdf_path: str, schemaName: str = None):
     self.pdf_path = pdf_path
+    self.schemaName = schemaName
     self.tables = {}
     self._extract_data()
 
@@ -37,13 +38,21 @@ class PdfExtractor:
     with pdfplumber.open(self.pdf_path) as self._pdf:
       self._pdf_content = fix_rtl_text(self._pdf.pages[0].extract_text())
 
-      # Determine which schema to use
-      self.schemaName = schemaManager.find_matching_schema(self._pdf_content)
+      # Use provided lab_name if specified, otherwise auto-detect
       if self.schemaName:
-        print(f"Using schema: {self.schemaName}")
-        self.schema = schemaManager.schemas[self.schemaName]
+        if self.schemaName in schemaManager.schemas:
+          self.schema = schemaManager.schemas[self.schemaName]
+          print(f"Using specified schema: {self.schemaName}")
+        else:
+          raise ValueError(f"Schema '{self.schemaName}' not found")
       else:
-        raise ValueError("No matching schema found for the PDF content")
+        # Determine which schema to use (auto-detection)
+        self.schemaName = schemaManager.find_matching_schema(self._pdf_content)
+        if self.schemaName:
+          print(f"Using auto-detected schema: {self.schemaName}")
+          self.schema = schemaManager.schemas[self.schemaName]
+        else:
+          raise ValueError("No matching schema found for the PDF content")
       
       self._extract_sampling_date()
       self._extract_type()
