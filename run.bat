@@ -1,1 +1,6 @@
-docker compose up ---watch
+@echo off
+echo Pulling latest changes from git...
+git pull origin main
+
+echo Starting Docker containers...
+docker compose up --watch
