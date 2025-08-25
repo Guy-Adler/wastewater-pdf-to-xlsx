@@ -20,6 +20,7 @@ Extract schemas are stored in [schemas/extract/](schemas/extract/)
 
 ```ts
 {
+  name: string; // name of the lab performing the tests
   identifierRegex: string; // Regex used to test if document matches schema
   samplingDateExtractionRegex: string; // Regex used to extract the sampling date. Needs to have a capture group named `date` (e.g. `(?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})`)
   type: {
@@ -61,6 +62,7 @@ Load schemas are stored in [schemas/load/](schemas/load/)
 
 ```ts
 {
+  name: string; // Name of the treatment plant
   sheets: {
     [key: string]: { // key is a test type
       name: string; // Name of the Excel sheet

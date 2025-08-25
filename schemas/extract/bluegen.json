@@ -1,4 +1,5 @@
 {
+  "name": "בלוג'ן",
   "identifierRegex": "בלוג'ן בע\"מ\nשדרות מנחם בגין 35 , טירת הכרמל.",
   "samplingDateExtractionRegex": "תאריך הדגימה: (?P<date>[0-9]{2}/[0-9]{2}/[0-9]{2})",
   "type": {
