@@ -101,6 +101,42 @@
       outline-offset: 2px;
     }
 
+    .file-input-group select {
+      width: 100%;
+      padding: 15px 20px;
+      background: #f8f9fa;
+      border: 2px solid #dee2e6;
+      border-radius: 10px;
+      font-size: 1em;
+      color: #495057;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-group select:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+      border-color: #667eea;
+      background: #fff;
+    }
+
+    .file-input-group select:hover {
+      background: #e9ecef;
+      border-color: #adb5bd;
+    }
+
+    .schema-selectors {
+      display: flex;
+      flex-direction: row;
+      gap: 2em;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .schema-selectors .file-input-group {
+      width: 100%;
+    }
+
     .selected-file {
       margin-top: 10px;
       padding: 10px;
@@ -217,6 +253,28 @@
 
     <form class="upload-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data"
       id="uploadForm">
+      <div class="schema-selectors">
+        <div class="file-input-group">
+          <label for="waste_treatment_plant">Plant Name:</label>
+          <select id="waste_treatment_plant" name="waste_treatment_plant" required>
+            <option disabled selected hidden value="">Select a treatment plant</option>
+            {% for schema_name, display_name in schemas.waste_treatment_plants.items() %}
+            <option value="{{ schema_name }}">{{ display_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="file-input-group">
+          <label for="lab_name">Lab Name:</label>
+          <select id="lab_name" name="lab_name" required>
+            <option disabled selected hidden value="">Select a lab</option>
+            {% for schema_name, display_name in schemas.labs.items() %}
+            <option value="{{ schema_name }}">{{ display_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
       <div class="file-input-group" id="pdf-group">
         <label for="pdf_file">PDF File:</label>
         <div class="file-input">

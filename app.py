@@ -1,15 +1,14 @@
 #!.venv/bin/python3
 
 import os
-import io
 import sys
 import tempfile
 import traceback
-import urllib.parse
-from flask import Flask, render_template, request, send_file, flash, redirect, url_for
+from flask import Flask, render_template, request, send_file
 from extract import PdfExtractor
 from transform import Transformer
 from load import Loader
+import json
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Set a secret key for session management
@@ -20,13 +19,53 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
+def get_available_schemas():
+    """Get available schemas for the select fields"""
+    schemas = {
+        'waste_treatment_plants': {},
+        'labs': {}
+    }
+    
+    # Read load schemas (waste treatment plants)
+    load_dir = "schemas/load"
+    if os.path.exists(load_dir):
+        for filename in os.listdir(load_dir):
+            if filename.endswith(".json"):
+                schema_name = filename.removesuffix('.json')
+                try:
+                    with open(os.path.join(load_dir, filename), "r", encoding="utf-8") as f:
+                        schema = json.load(f)
+                        display_name = schema.get('name')
+                        if display_name is not None:
+                            schemas['waste_treatment_plants'][schema_name] = display_name
+                except Exception as e:
+                    print(f"Error reading schema {filename}: {e}")
+    
+    # Read extract schemas (labs)
+    extract_dir = "schemas/extract"
+    if os.path.exists(extract_dir):
+        for filename in os.listdir(extract_dir):
+            if filename.endswith(".json"):
+                schema_name = filename.removesuffix('.json')
+                try:
+                    with open(os.path.join(extract_dir, filename), "r", encoding="utf-8") as f:
+                        schema = json.load(f)
+                        display_name = schema.get('name')
+                        if display_name is not None:
+                            schemas['labs'][schema_name] = display_name
+                except Exception as e:
+                    print(f"Error reading schema {filename}: {e}")
+    
+    return schemas
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    schemas = get_available_schemas()
+    return render_template('index.html', schemas=schemas)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -36,10 +75,21 @@ def upload_file():
     pdf_file = request.files['pdf_file']
     xlsx_file = request.files['xlsx_file']
     
+    # Get the selected waste treatment plant and lab name
+    load_schema_name = request.form.get('waste_treatment_plant')
+    extract_schema_name = request.form.get('lab_name')
+    
     # Check if files were selected
     if pdf_file.filename == '' or xlsx_file.filename == '':
         return {'error': 'Both PDF and XLSX files must be selected'}, 400
     
+    # Check if waste treatment plant and lab name were selected
+    if not load_schema_name:
+        return {'error': 'Waste treatment plant must be selected'}, 400
+    
+    if not extract_schema_name:
+        return {'error': 'Lab name must be selected'}, 400
+   
     # Check file extensions
     if not (pdf_file and allowed_file(pdf_file.filename) and 
             pdf_file.filename.lower().endswith('.pdf')):
@@ -71,7 +121,7 @@ def upload_file():
         
         try:
             # Process the files using existing code
-            pdf_extractor = PdfExtractor(pdf_temp_path)
+            pdf_extractor = PdfExtractor(pdf_temp_path, extract_schema_name)
             extracted_data = {
                 "sampling_date": pdf_extractor.sampling_date,
                 "tables": pdf_extractor.tables,
@@ -86,7 +136,7 @@ def upload_file():
                 "results": transformer.results,
             }
             
-            loader = Loader(xlsx_temp_path, 'acre')
+            loader = Loader(xlsx_temp_path, load_schema_name)
             loader.load(transformed_data)
             
             # Return the processed file with proper headers
