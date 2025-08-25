@@ -1,0 +1,28 @@
+services:
+  wastewater-pdf-to-xlsx:
+    image: wastewater-pdf-to-xlsx
+    build: .
+    ports:
+      - 5000:5000
+    develop:
+      watch:
+        - action: sync
+          path: ./templates
+          target: /home/python/templates
+        - action: sync
+          path: ./schemas
+          target: /home/python/schemas
+        - action: sync
+          path: ./extract
+          target: /home/python/extract
+        - action: sync
+          path: ./load
+          target: /home/python/load
+        - action: sync
+          path: ./transform
+          target: /home/python/transform
+        - action: sync
+          path: ./app.py
+          target: /home/python/app.py
+        - action: rebuild
+          path: ./requirements.txt
